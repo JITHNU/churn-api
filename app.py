@@ -20,6 +20,10 @@ expected_features = ['SeniorCitizen', 'Tenure', 'MonthlyCharges', 'TotalCharges'
 
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return "Churn Prediction API is running!"
+
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
