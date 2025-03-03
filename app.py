@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify
 import joblib
 import pandas as pd
+import os
 
 # Load trained model
 model = joblib.load("churn_model.pkl")
 
-# Define feature names (same as training)
+# Define feature names
 expected_features = ['SeniorCitizen', 'Tenure', 'MonthlyCharges', 'TotalCharges', 'Gender_Male',
                      'Partner_Yes', 'Dependents_Yes', 'PhoneService_Yes', 'MultipleLines_No phone service',
                      'MultipleLines_Yes', 'InternetService_Fiber optic', 'InternetService_No',
@@ -28,7 +29,7 @@ def predict():
         # Validate input
         if not data:
             return jsonify({"error": "No input data provided"}), 400
-        
+
         # Ensure all expected features are in the input
         sample_data = pd.DataFrame([{feature: 0 for feature in expected_features}])
         for key in data:
@@ -45,8 +46,10 @@ def predict():
         return jsonify({"prediction": result})
     
     except Exception as e:
-        print("Error:", str(e))  # Print error in Flask terminal
+        print("Error:", str(e))  # Print error in Railway logs
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Use Railway's assigned port dynamically
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
